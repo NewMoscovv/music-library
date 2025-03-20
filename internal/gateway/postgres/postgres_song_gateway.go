@@ -14,10 +14,10 @@ func (pg *PgSongGateway) GetSongs(filter map[string]string, limit, offset int) (
 	var songs []models.Song
 	query := pg.db
 
-	if group, ok := filter["group"]; ok {
+	if group, ok := filter["group"]; ok && group != "" {
 		query = query.Where("group = ?", group)
 	}
-	if song, ok := filter["song"]; ok {
+	if song, ok := filter["song"]; ok && song != "" {
 		query = query.Where("song = ?", song)
 	}
 
@@ -37,8 +37,11 @@ func (pg *PgSongGateway) GetSongByID(id int) (*models.Song, error) {
 }
 
 func (pg *PgSongGateway) CreateSong(song *models.Song) error {
-	//TODO implement me
-	panic("implement me")
+	err := pg.db.Create(song).Error
+	if err != nil {
+		myLogger.Error("Ошибка при добавлении песни", map[string]interface{}{"error": err.Error()})
+	}
+	return err
 }
 
 func (pg *PgSongGateway) UpdateSong(song *models.Song) error {
