@@ -5,10 +5,10 @@ import (
 	myLogger "Music-library/pkg/logger"
 )
 
-func Migrate(logger *myLogger.Logger) {
+func Migrate() {
 	err := DB.AutoMigrate(&models.Song{})
 	if err != nil {
-		logger.Err.Fatalf("Error migrating database: %v", err)
+		myLogger.Fatal("Ошибка миграции базы данных", map[string]interface{}{"error": err.Error()})
 	}
-	logger.Info.Println("Migrated database successfully")
+	myLogger.Info("Миграция БД успешно завершена", nil)
 }

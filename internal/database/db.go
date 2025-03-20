@@ -10,7 +10,7 @@ import (
 
 var DB *gorm.DB
 
-func Init(cfg *config.Config, logger *myLogger.Logger) {
+func Init(cfg *config.Config) {
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		cfg.DBUser, cfg.DBPass, cfg.DBHost, cfg.DBPort, cfg.DBName,
@@ -19,7 +19,7 @@ func Init(cfg *config.Config, logger *myLogger.Logger) {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		logger.Err.Fatalf("Error connecting to database: %v", err)
+		myLogger.Fatal("Ошибка подключения к БД", map[string]interface{}{"error": err.Error()})
 	}
-	logger.Info.Printf("Connected to database")
+	myLogger.Info("Подключение к БД успешно установлено", nil)
 }

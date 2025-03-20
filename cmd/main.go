@@ -3,28 +3,38 @@ package main
 import (
 	"Music-library/config"
 	"Music-library/internal/database"
+	"Music-library/internal/gateway/postgres"
+	"Music-library/internal/routes"
 	myLogger "Music-library/pkg/logger"
 	"fmt"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	// инициируем логирование
-	logger := myLogger.Init()
-
 	// инициируем конфиг
-	cfg, err := config.Init()
-	if err != nil {
-		logger.Err.Fatalf("Error loading config: %v", err)
-	}
+	cfg := config.Init()
+
+	// инициируем логирование
+	myLogger.Init(cfg.LogLevel)
 
 	// подключаемся к базе данных
-	database.Init(cfg, logger)
+	database.Init(cfg)
 
 	// запускаем миграции
-	database.Migrate(logger)
+	database.Migrate()
 
-	// вывод сообщения об успешном запуске
-	fmt.Println("приложение запущено")
+	// инициируем gateway
+	songGateway := postgres.NewPgSongGateway(database.DB)
 
+	// создаем роутер
+	router := gin.Default()
+
+	// передаем Gateway в обработчик
+	routes.SetupRoutes(router, songGateway)
+
+	// запускаем сервак
+	port := fmt.Sprintf(":%s", cfg.AppPort)
+	myLogger.Info("Сервер запущен на порту"+cfg.AppPort, nil)
+	router.Run(port)
 }
