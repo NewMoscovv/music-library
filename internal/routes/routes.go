@@ -12,7 +12,11 @@ func SetupRoutes(router *gin.Engine, songGateway gateway.SongGateway) {
 	songRoutes := router.Group("/songs")
 	{
 		songRoutes.GET("", songHandler.GetSongs)
+		songRoutes.GET("/:id", songHandler.GetSongByID)
 		songRoutes.POST("", songHandler.AddSong)
+		songRoutes.PUT("/:id", songHandler.UpdateSong)
+		songRoutes.DELETE("/:id", songHandler.DeleteSong)
+		songRoutes.GET("/:id/lyrics", songHandler.GetLyrics)
 	}
 
 }
