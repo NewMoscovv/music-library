@@ -19,10 +19,12 @@ func main() {
 	}
 
 	// подключаемся к базе данных
-	db, err := database.Init(cfg)
-	if err != nil {
-		logger.Err.Fatalf("Error connecting to database: %v", err)
-	}
+	database.Init(cfg, logger)
 
-	fmt.Println("Connected to database", db)
+	// запускаем миграции
+	database.Migrate(logger)
+
+	// вывод сообщения об успешном запуске
+	fmt.Println("приложение запущено")
+
 }

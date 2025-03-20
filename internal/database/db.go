@@ -2,19 +2,24 @@ package database
 
 import (
 	"Music-library/config"
+	myLogger "Music-library/pkg/logger"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func Init(cfg *config.Config) (*gorm.DB, error) {
+var DB *gorm.DB
+
+func Init(cfg *config.Config, logger *myLogger.Logger) {
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		cfg.DBUser, cfg.DBPass, cfg.DBHost, cfg.DBPort, cfg.DBName,
 	)
-	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	var err error
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		logger.Err.Fatalf("Error connecting to database: %v", err)
 	}
-	return DB, nil
+	logger.Info.Printf("Connected to database")
 }
