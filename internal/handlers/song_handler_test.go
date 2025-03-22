@@ -139,3 +139,44 @@ func TestDeleteSong_InvalidID(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	assert.Contains(t, w.Body.String(), "Некорректный ID")
 }
+
+func TestUpdateSong(t *testing.T) {
+	myLogger.Init("debug")
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRepo := mocks.NewMockSongGateway(ctrl)
+
+	input := `{
+		"group": "Smeshariki",
+		"song": "Kto mechtaet bit pilotom",
+		"release_date": "2017-02-01",
+		"text": "Some text",
+		"link": "nolink.com"
+		}`
+
+	mockRepo.EXPECT().
+		UpdateSong(gomock.AssignableToTypeOf(&models.Song{})).
+		DoAndReturn(func(song *models.Song) error {
+			assert.Equal(t, uint(1), song.ID)
+			assert.Equal(t, "Smeshariki", song.Group)
+			assert.Equal(t, "Kto mechtaet bit pilotom", song.Song)
+			return nil
+		})
+
+	handler := handlers.NewSongHandler(mockRepo)
+
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	r.PUT("/songs/:id", handler.UpdateSong)
+
+	req := httptest.NewRequest(http.MethodPut, "/songs/1", strings.NewReader(input))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), "Some text")
+
+}
