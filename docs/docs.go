@@ -347,20 +347,37 @@ const docTemplate = `{
         "models.Song": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2025-03-22T10:00:00Z"
+                },
                 "group": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Imagine Dragons"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "link": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "https://youtube.com/believer"
                 },
                 "release_date": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2017-02-01"
                 },
                 "song": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Believer"
                 },
                 "text": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "First things first..."
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2025-03-22T10:01:00Z"
                 }
             }
         }

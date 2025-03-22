@@ -2,15 +2,29 @@ basePath: /
 definitions:
   models.Song:
     properties:
-      group:
+      created_at:
+        example: "2025-03-22T10:00:00Z"
         type: string
+      group:
+        example: Imagine Dragons
+        type: string
+      id:
+        example: 1
+        type: integer
       link:
+        example: https://youtube.com/believer
         type: string
       release_date:
+        example: "2017-02-01"
         type: string
       song:
+        example: Believer
         type: string
       text:
+        example: First things first...
+        type: string
+      updated_at:
+        example: "2025-03-22T10:01:00Z"
         type: string
     type: object
 host: localhost:8080
