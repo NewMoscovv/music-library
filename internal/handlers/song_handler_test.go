@@ -90,3 +90,30 @@ func TestAddSong(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Contains(t, w.Body.String(), "Believer")
 }
+
+func TestDeleteSong(t *testing.T) {
+	myLogger.Init("debug")
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRepo := mocks.NewMockSongGateway(ctrl)
+
+	mockRepo.EXPECT().
+		DeleteSong(uint(1)).
+		Return(nil)
+
+	handler := handlers.NewSongHandler(mockRepo)
+
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	r.DELETE("/songs/:id", handler.DeleteSong)
+
+	req := httptest.NewRequest(http.MethodDelete, "/songs/1", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), "удалена")
+
+}
