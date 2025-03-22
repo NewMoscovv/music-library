@@ -2,6 +2,7 @@ package main
 
 import (
 	"Music-library/config"
+	_ "Music-library/docs"
 	"Music-library/internal/gateway/postgres"
 	"Music-library/internal/routes"
 	database2 "Music-library/pkg/database"
