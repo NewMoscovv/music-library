@@ -48,3 +48,57 @@ DB_PASSWORD=password
 DB_NAME=postgres
 API_URL=http://localhost:8080
 ```
+
+---
+
+## Swagger-документация
+
+**http://localhost:8080/swagger/index.html**
+
+---
+
+## Примеры запросов
+
+1. Добавление песни
+```bash
+   curl -X POST http://localhost:8080/songs \
+-H "Content-Type: application/json" \
+-d '{
+"group": "Смешарики",
+"song": "От винта!"
+}'
+```
+2. Удаление песни
+```bash
+curl -X DELETE http://localhost:8080/songs/1
+```
+3. Получить список песен с фильтрацией и пагинацией
+```bash
+curl -X GET http:/localhost:8080/songs?group=ALBLAK%2052
+```
+Можно фильтровать по любому полю:
+- group
+- song
+- release_date
+- text
+- link
+4. Получить песню по ID
+```bash
+curl -X GET http://localhost:8080/songs/1
+```
+5. Обновить песню по ID
+```bash
+curl -X PUT http://localhost:8080/songs/1 \
+-H "Content-Type: application/json" \
+-d '{
+  "group": "Imagine Dragons",
+  "song": "Thunder",
+  "release_date": "2017-04-27",
+  "text": "Just a young gun...",
+  "link": "https://youtube.com/example"
+}'
+```
+6. Получить текст песни построчно
+```bash
+curl -X GET http://localhost:8080/songs/1/lyrics?page=1&limit=3
+```
