@@ -3,7 +3,7 @@ package models
 import "gorm.io/gorm"
 
 type Song struct {
-	gorm.Model
+	gorm.Model  `swaggerignore:"true"`
 	Group       string `json:"group"`
 	Song        string `json:"song"`
 	ReleaseDate string `json:"release_date"`
