@@ -117,3 +117,25 @@ func TestDeleteSong(t *testing.T) {
 	assert.Contains(t, w.Body.String(), "удалена")
 
 }
+
+func TestDeleteSong_InvalidID(t *testing.T) {
+	myLogger.Init("debug")
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRepo := mocks.NewMockSongGateway(ctrl)
+
+	handler := handlers.NewSongHandler(mockRepo)
+
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	r.DELETE("/songs/:id", handler.DeleteSong)
+
+	req := httptest.NewRequest(http.MethodDelete, "/songs/word", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Contains(t, w.Body.String(), "Некорректный ID")
+}
