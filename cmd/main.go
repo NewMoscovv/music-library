@@ -2,38 +2,48 @@ package main
 
 import (
 	"Music-library/config"
-	"Music-library/internal/database"
 	"Music-library/internal/gateway/postgres"
 	"Music-library/internal/routes"
+	database2 "Music-library/pkg/database"
 	myLogger "Music-library/pkg/logger"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title Music Library API
+// @version 1.0
+// @description Приложение для онлайн-библиотеки музыки на RestAPI
+// @host localhost:8080
+// @BasePath /
 func main() {
 
-	// инициируем конфиг
+	// 1. Загружаем конфиг
 	cfg := config.Init()
 
-	// инициируем логирование
+	// 2. Инициализируем логирование
 	myLogger.Init(cfg.LogLevel)
 
-	// подключаемся к базе данных
-	database.Init(cfg)
+	// 3. Подключаем к базе данных
+	database2.Init(cfg)
 
-	// запускаем миграции
-	database.Migrate()
+	// 4. Запускаем миграции
+	database2.Migrate()
 
-	// инициируем gateway
-	songGateway := postgres.NewPgSongGateway(database.DB)
+	// 5. Инициализируем gateway
+	songGateway := postgres.NewPgSongGateway(database2.DB)
 
-	// создаем роутер
+	// 6. Создаем роутер
 	router := gin.Default()
 
-	// передаем Gateway в обработчик
+	// 7. Регистрируем маршруты
 	routes.SetupRoutes(router, songGateway)
 
-	// запускаем сервак
+	// 8. Swagger UI
+	router.GET("swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// 9. Запускаем сервак
 	port := fmt.Sprintf(":%s", cfg.AppPort)
 	myLogger.Info("Сервер запущен на порту"+cfg.AppPort, nil)
 	router.Run(port)
