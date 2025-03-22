@@ -20,8 +20,11 @@ func NewSongHandler(gateway gateway.SongGateway) *SongHandler {
 
 func (h *SongHandler) GetSongs(c *gin.Context) {
 	filter := map[string]string{
-		"group": c.Query("group"),
-		"song":  c.Query("song"),
+		"group":        c.Query("group"),
+		"song":         c.Query("song"),
+		"release_date": c.Query("release_date"),
+		"text":         c.Query("text"),
+		"link":         c.Query("link"),
 	}
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))

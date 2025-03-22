@@ -20,6 +20,15 @@ func (pg *PgSongGateway) GetSongs(filter map[string]string, limit, offset int) (
 	if song, ok := filter["song"]; ok && song != "" {
 		query = query.Where("song = ?", song)
 	}
+	if releaseDate, ok := filter["release_date"]; ok && releaseDate != "" {
+		query = query.Where("release_date = ?", releaseDate)
+	}
+	if text, ok := filter["text"]; ok && text != "" {
+		query = query.Where("text = ?", text)
+	}
+	if link, ok := filter["link"]; ok && link != "" {
+		query = query.Where("link = ?", link)
+	}
 
 	// запрашиваем песни
 	err := query.Limit(limit).Offset(offset).Find(&songs).Error
