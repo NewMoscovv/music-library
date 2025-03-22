@@ -46,8 +46,15 @@ func (h *SongHandler) GetSongs(c *gin.Context) {
 		"text":         c.Query("text"),
 		"link":         c.Query("link"),
 	}
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	if err != nil || limit < 1 {
+		limit = 10
+	}
 	offset := (page - 1) * limit
 
 	songs, err := h.gateway.GetSongs(filter, limit, offset)

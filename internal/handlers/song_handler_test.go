@@ -4,6 +4,7 @@ import (
 	"Music-library/internal/gateway/mocks"
 	"Music-library/internal/handlers"
 	"Music-library/internal/models"
+	myLogger "Music-library/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
@@ -13,6 +14,8 @@ import (
 )
 
 func TestGetSongs(t *testing.T) {
+	myLogger.Init("debug")
+
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -21,7 +24,7 @@ func TestGetSongs(t *testing.T) {
 	mockRepo.EXPECT().
 		GetSongs(gomock.Any(), 10, 0).
 		Return([]models.Song{{
-			Group: "SHAMAN", Song: "YA RUSSKI"},
+			ID: 1, Group: "SHAMAN", Song: "YA RUSSKI"},
 		}, nil)
 
 	handler := handlers.NewSongHandler(mockRepo)
