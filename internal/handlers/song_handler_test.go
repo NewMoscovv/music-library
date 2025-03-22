@@ -210,3 +210,37 @@ func TestGetSongByID(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Contains(t, w.Body.String(), "Smeshariki")
 }
+
+func TestGetLyrics(t *testing.T) {
+	myLogger.Init("debug")
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRepo := mocks.NewMockSongGateway(ctrl)
+
+	text := `Куплет 1
+Куплет 2
+Куплет 3
+Куплет 4`
+	mockRepo.EXPECT().
+		GetSongByID(uint(1)).
+		Return(&models.Song{
+			ID:   1,
+			Text: text,
+		}, nil)
+
+	handler := handlers.NewSongHandler(mockRepo)
+
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	r.GET("/songs/:id/lyrics", handler.GetLyrics)
+
+	req := httptest.NewRequest(http.MethodGet, "/songs/1/lyrics?page=1&limit=2", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, w.Body.String(), "Куплет 1")
+	assert.Contains(t, w.Body.String(), "Куплет 2")
+	assert.NotContains(t, w.Body.String(), "Куплет 31")
+}
