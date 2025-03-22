@@ -5,6 +5,7 @@ import (
 	"Music-library/internal/models"
 	myLogger "Music-library/pkg/logger"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -111,32 +112,9 @@ func (h *SongHandler) AddSong(c *gin.Context) {
 		return
 	}
 
-	// Формируем URL внешнего API
-	apiUrl := fmt.Sprintf(
-		"%s/info?group=%s&song=%s",
-		os.Getenv("API_URL"),
-		url.QueryEscape(input.Group),
-		url.QueryEscape(input.Song),
-	)
-
-	// Отправляем GET-запрос
-	resp, err := http.Get(apiUrl)
+	details, err := FetchSongDetails(input.Group, input.Song)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"error": "Не удалось подключиться к внешнему API"})
-		return
-	}
-	defer resp.Body.Close()
-
-	// Проверяем статус ответа
-	if resp.StatusCode != http.StatusOK {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "API вернул ошибку"})
-		return
-	}
-
-	// Распарсим тело ответа
-	var details models.SongDetail
-	if err := json.NewDecoder(resp.Body).Decode(&details); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка обработки ответа API"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -253,4 +231,25 @@ func (h *SongHandler) GetLyrics(c *gin.Context) {
 		end = len(verses)
 	}
 	c.JSON(http.StatusOK, verses[offset:end])
+}
+
+var FetchSongDetails = func(group, song string) (*models.SongDetail, error) {
+	apiURL := fmt.Sprintf("%s/info?group=%s&song=%s",
+		os.Getenv("API_URL"),
+		url.QueryEscape(group),
+		url.QueryEscape(song),
+	)
+
+	resp, err := http.Get(apiURL)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return nil, errors.New("ошибка при запросе к API")
+	}
+	defer resp.Body.Close()
+
+	var details models.SongDetail
+	if err := json.NewDecoder(resp.Body).Decode(&details); err != nil {
+		return nil, err
+	}
+	return &details, nil
+
 }
